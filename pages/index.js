@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { CheckIcon, BackArrowIcon } from "../components/icons";
 import NotFound from "../components/not_found";
 import LogoHeader from "../components/logo_header";
+import BadUrlView from "../components/bad_url";
 
 var formatter = Intl.NumberFormat("en-US", {
   style: "currency",
@@ -174,17 +175,21 @@ export default function Home({ remote }) {
   //   fetcher
   // );
 
+  if (remote.address == "" || remote.zipcode == "") {
+    return <BadUrlView message="Address and zipcode are missing" />;
+  }
+
   if (remote.address == null && remote.zipcode == null) {
-    // TODO missing address and zipcode view
-    return <div>Missing address and zipcode view</div>;
+    return <BadUrlView message="Address and zipcode are missing" />;
+    // return <div>Missing address and zipcode view</div>;
   }
   if (remote.address == null && remote.zipcode != null) {
-    // TODO missing address view
-    return <div>Missing address view</div>;
+    return <BadUrlView message="Address is missing" />;
+    // return <div>Missing address view</div>;
   }
   if (remote.address != null && remote.zipcode == null) {
-    // TODO missing zipcode view
-    return <div>Missing zipcode view</div>;
+    return <BadUrlView message="Zipcode is missing" />;
+    // return <div>Missing zipcode view</div>;
   }
 
   return <RemoteFetching remote={remote} />;
