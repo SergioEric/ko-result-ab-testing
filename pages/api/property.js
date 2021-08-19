@@ -6,7 +6,7 @@ const url = "https://api.housecanary.com/v2/property/value_analysis/check";
 const API_KEY = process.env.API_KEY;
 const API_SECRET = process.env.API_SECRET;
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { address, zipcode } = req.query;
   if (address == undefined && zipcode == undefined)
     return res.status(400).send("Address and Zipcode is missing");
@@ -18,6 +18,7 @@ export default function handler(req, res) {
   params.append("address", address);
   params.append("zipcode", zipcode);
 
+  // setTimeout(() => {
   fetch(url + "?" + params, {
     headers: {
       Authorization:
@@ -50,4 +51,5 @@ export default function handler(req, res) {
     })
     // TODO handling correctly the error with a custom message
     .catch((error) => res.status(404).send(error));
+  // }, 2000);
 }

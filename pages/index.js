@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Head from "next/head";
 import useSWR from "swr";
 
@@ -5,6 +6,7 @@ import { CheckIcon, BackArrowIcon } from "../components/icons";
 import NotFound from "../components/not_found";
 import LogoHeader from "../components/logo_header";
 import BadUrlView from "../components/bad_url";
+import TimeOutView from "../components/timeout";
 
 var formatter = Intl.NumberFormat("en-US", {
   style: "currency",
@@ -12,6 +14,10 @@ var formatter = Intl.NumberFormat("en-US", {
 });
 
 const fetcher = async (url) => {
+  // const controller = new AbortController();
+  //after 8 seconds we abort the request to the server
+  // const timeout = setTimeout(() => controller.abort(), 800);
+  //{ signal: controller.signal }
   const res = await fetch(url);
 
   // If the status code is not in the range 200-299,
@@ -24,6 +30,8 @@ const fetcher = async (url) => {
     throw error;
   }
 
+  // clearTimeout(timeout);
+
   return res.json();
 };
 
@@ -33,17 +41,29 @@ const checklist_reason = [
   // "check list reason 3",
   // "check list reason 4",
 ];
-
 const RemoteFetching = ({ remote }) => {
+  const [timeoutExceeded, setTimeoutForRequest] = useState(false);
+  const onLoadingSlow = (key, config) => {
+    // loadingTimeout was exceeded
+    // console.log("loadingTimeout was exceeded");
+    setTimeoutForRequest(true);
+  };
   const { data, error } = useSWR(
     `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`,
-    fetcher
+    fetcher,
+    {
+      shouldRetryOnError: false,
+      loadingTimeout: 8000,
+      onLoadingSlow: onLoadingSlow,
+    }
   );
-  if (error) {
-    // TODO component into view
+
+  if (error && !timeoutExceeded) {
     return <NotFound remote={remote} />;
   }
-  // if (!data) return <div>loading...</div>;
+  if (timeoutExceeded) {
+    return <TimeOutView />;
+  }
   return (
     <section className="main-section">
       <Head>
