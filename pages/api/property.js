@@ -33,7 +33,8 @@ export default async function handler(req, res) {
       // check for "All pre-analysis checks passed"
       if (json.code != undefined && json.code == 404) {
         //Sorry, we cannot find this address
-        return res.status(404).json({
+        return res.status(200).json({
+          data: false,
           message: json.code_description.message,
         });
       }
@@ -43,11 +44,14 @@ export default async function handler(req, res) {
       console.log(`checks: ${checks["All pre-analysis checks passed"]}`);
       if (!checks["All pre-analysis checks passed"] ?? true) {
         // the adddres dosen't have an estimated value
-        return res
-          .status(404)
-          .send("The Adddres doesn't have an estimated value");
+        console.log('!checks["All pre-analysis checks passed"] ?? true');
+        return res.status(200).json({ data: false });
+        // .send("The Adddres doesn't have an estimated value");
       }
-      if (json) return res.status(200).json(json);
+      if (json)
+        return res
+          .status(200)
+          .json({ data: true, price: json.hc_avm_value_analysis.avm_value });
     })
     // TODO handling correctly the error with a custom message
     .catch((error) => res.status(404).send(error));

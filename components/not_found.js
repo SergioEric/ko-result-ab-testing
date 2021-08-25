@@ -6,7 +6,7 @@ const NotFound = ({ remote }) => {
     <section className="main-section">
       <LogoHeader />
       <div className="offer-container">
-        <div className="margin-top"></div>.
+        <div className="margin-top"></div>
         <h2 className="preliminary-text">Sorry,</h2>
         <Image
           src="/not_found.png"
@@ -21,8 +21,7 @@ const NotFound = ({ remote }) => {
           {remote.address} {remote.city}, {remote.state} {remote.zipcode}
         </div>
         <div className="paragraph">
-          However, you are welcome to introduce us to your favorite General
-          Contractor in your area
+          Click here to sell your house through a Keller Williams Agent
           <br />
           <br />
           Just reach out to us at{" "}
@@ -31,6 +30,7 @@ const NotFound = ({ remote }) => {
       </div>
       <style jsx>{`
         * {
+          border: 1px solid blue;
         }
         h2,
         img {
