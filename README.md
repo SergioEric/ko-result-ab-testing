@@ -1,3 +1,3 @@
 # ko-ab-test
 
-Client next.js app used for A/B testing. 
+Client next.js app used for A/B testing.

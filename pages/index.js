@@ -120,7 +120,7 @@ const RemoteFetching = ({ remote }) => {
       <Footer />
       <style jsx>{`
         * {
-          border: 1px solid rgba(5, 226, 255, 0);
+          border: 1px solid rgba(5, 226, 255, 0.2);
         }
         .main-section {
           max-width: 100%;
@@ -130,7 +130,7 @@ const RemoteFetching = ({ remote }) => {
           height: 100vh;
         }
         .offer-container {
-          max-width: 70%;
+          max-width: 80%;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -150,6 +150,8 @@ const RemoteFetching = ({ remote }) => {
         .offer-and-address {
           display: flex;
           margin-bottom: 20px;
+          border: 1px solid rgb(112, 112, 112);
+          width: 100%;
         }
         .offer-and-animation {
           display: flex;

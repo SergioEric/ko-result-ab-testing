@@ -54,7 +54,7 @@ function LoadingAnimation({ active }) {
       loop: true,
       direction: "alternate",
     });
-    if (!active) seek();
+    // if (!active) seek();
   }, [active]);
   useEffect(() => {
     console.log("re-render LoadingAnimation");
