@@ -3,8 +3,8 @@ const { URLSearchParams } = require("url");
 
 const url = "https://api.housecanary.com/v2/property/value_analysis/check";
 
-const API_KEY = process.env.API_KEY;
-const API_SECRET = process.env.API_SECRET;
+const API_KEY = process.env.HC_API_KEY;
+const API_SECRET = process.env.HC_API_SECRET;
 
 export default async function handler(req, res) {
   const { address, zipcode } = req.query;
