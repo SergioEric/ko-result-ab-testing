@@ -9,8 +9,8 @@ const BadUrlView = ({ message }) => {
         <Image
           src="/not_found.png"
           className="logo-img"
-          height={195.32}
-          width={265}
+          height={292.98 + 40}
+          width={397.5 + 40}
           alt="ko-logo"
         />
         <section className="message-section">

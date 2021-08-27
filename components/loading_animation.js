@@ -118,14 +118,16 @@ function LoadingAnimation({ active }) {
           font-size: 14px;
           color: #7f8cb2;
           position: absolute;
+          margin: 0;
+          bottom: 0;
         }
 
         .min-value {
-          left: 0;
+          left: 20px;
         }
 
         .max-value {
-          right: 0;
+          right: 20px;
         }
 
         .needle {
@@ -137,7 +139,8 @@ function LoadingAnimation({ active }) {
         }
         .group-animation {
           position: relative;
-          display: inline-flexbox;
+          display: flex;
+          align-self: center;
         }
       `}</style>
     </div>

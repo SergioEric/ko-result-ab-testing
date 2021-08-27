@@ -7,17 +7,17 @@ const TimeOutView = ({ remote }) => {
     <section className="main-section">
       <LogoHeader />
       <div className="main-container">
-        <Image src={svg} width={250} height={250} />
+        <Image src={svg} width={321} height={321} />
         <section className="message-section">
-          <h2 className="preliminary-text">Request Time Out</h2>
+          <h2 className="preliminary-text">It is not you!</h2>
           <div className="message-avscsc">
-            The server took a long time to respond
+            The server took an awful long time to respond.
           </div>
           <div
             className="action-btn"
             onClick={() => alert("TODO: redirect to instapage")}
           >
-            <p>Try again</p>
+            <p>Please try again</p>
           </div>
         </section>
       </div>
@@ -34,6 +34,7 @@ const TimeOutView = ({ remote }) => {
         }
         .main-container {
           max-width: 70%;
+          max-width: 1440px;
           display: flex;
           column-gap: 157px;
           flex-direction: row;

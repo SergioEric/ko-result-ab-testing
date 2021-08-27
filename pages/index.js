@@ -119,22 +119,26 @@ const RemoteFetching = ({ remote }) => {
       <div style={{ flexGrow: 1 }}></div>
       <Footer />
       <style jsx>{`
-        * {
-          border: 1px solid rgba(5, 226, 255, 0.2);
+         {
+          /* * {
+          border: 1px solid rgba(5, 226, 255, 0);
+        } */
         }
         .main-section {
-          max-width: 100%;
+          width: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           height: 100vh;
         }
         .offer-container {
-          max-width: 80%;
+          max-width: 1440px;
+          width: 80%;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          padding: 20px 0px;
         }
         .offer {
           display: flex;
@@ -150,8 +154,8 @@ const RemoteFetching = ({ remote }) => {
         .offer-and-address {
           display: flex;
           margin-bottom: 20px;
-          border: 1px solid rgb(112, 112, 112);
           width: 100%;
+          flex-direction: row;
         }
         .offer-and-animation {
           display: flex;
@@ -163,7 +167,7 @@ const RemoteFetching = ({ remote }) => {
           font-weight: 700;
           font-size: 24px;
           color: var(--orange);
-          margin-top: 0; //10px;
+          margin: 0;
           text-align: center;
         }
 
@@ -175,6 +179,9 @@ const RemoteFetching = ({ remote }) => {
           color: var(--blue-gray);
           align-self: center;
           padding: 0px 40px;
+          width: 100%;
+          text-align: center;
+          margin-top: 10px;
         }
         .check {
           column-gap: 5px;
@@ -189,25 +196,22 @@ const RemoteFetching = ({ remote }) => {
           margin-right: 5px;
           border-radius: 20px;
         }
-        .address {
-          color: #5e6792;
-        }
         .primary {
           color: #234951;
         }
         .main-box {
           padding: 30px;
         }
-        .ko {
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-        }
         .margin-top {
           margin-top: 100px;
+        }
+        @media (max-width: 830px) {
+          .offer-and-address {
+            flex-direction: column;
+            justify-content: center;
+            display: flex;
+            align-self: center;
+          }
         }
       `}</style>
     </section>
