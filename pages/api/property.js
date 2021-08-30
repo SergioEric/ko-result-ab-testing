@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const { URLSearchParams } = require("url");
 
-const url = "https://api.housecanary.com/v2/property/value_analysis/check";
+const url = "https://api.housecanary.com/v2/property/value";
 
 const API_KEY = process.env.HC_API_KEY;
 const API_SECRET = process.env.HC_API_SECRET;
@@ -18,42 +18,32 @@ export default async function handler(req, res) {
   params.append("address", address);
   params.append("zipcode", zipcode);
 
-  // setTimeout(() => {
-  fetch(url + "?" + params, {
+  const response = await fetch(url + "?" + params, {
     headers: {
       Authorization:
         "Basic " + Buffer.from(API_KEY + ":" + API_SECRET).toString("base64"),
     },
-  })
-    .then((res) => res.json())
-    .then(function (json) {
-      console.log(json);
-      console.log(typeof json); //-> object, meaning we don't need to parse as a JSON object
+  });
+  if (response.status != 200) {
+    // not result
+    return no_result(res);
+  }
+  const json = await response.json();
 
-      // check for "All pre-analysis checks passed"
-      if (json.code != undefined && json.code == 404) {
-        //Sorry, we cannot find this address
-        return res.status(200).json({
-          data: false,
-          message: json.code_description.message,
-        });
-      }
-
-      const checks = json.checks;
-
-      console.log(`checks: ${checks["All pre-analysis checks passed"]}`);
-      if (!checks["All pre-analysis checks passed"] ?? true) {
-        // the adddres dosen't have an estimated value
-        console.log('!checks["All pre-analysis checks passed"] ?? true');
-        return res.status(200).json({ data: false });
-        // .send("The Adddres doesn't have an estimated value");
-      }
-      if (json)
-        return res
-          .status(200)
-          .json({ data: true, price: json.hc_avm_value_analysis.avm_value });
-    })
-    // TODO handling correctly the error with a custom message
-    .catch((error) => res.status(404).send(error));
-  // }, 2000);
+  const property =
+    json.length >= 1 ? json[0]["property/value"] : json["property/value"];
+  if (property.api_code != 0 || property.result == null) {
+    // there's no result for the address
+    return no_result(res);
+  }
+  console.log(property);
+  const map = {
+    data: true,
+    price: property.result.value.price_mean,
+    lwr: property.result.value.price_lwr,
+    upr: property.result.value.price_upr,
+  };
+  return res.status(200).json(map);
 }
+
+const no_result = (res) => res.status(200).json({ data: false });

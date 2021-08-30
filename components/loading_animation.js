@@ -1,8 +1,15 @@
 import { useEffect, useRef } from "react";
-// import anime from "animejs/lib/anime.es.js";
 import animejs from "animejs";
+import TextLoading from "./dots_animation";
 
-function LoadingAnimation({ active }) {
+var formatter = Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+function LoadingAnimation({ active, min_value, max_value }) {
   const animation_progress = useRef(0);
 
   const anime = useRef(() => {});
@@ -59,6 +66,7 @@ function LoadingAnimation({ active }) {
   useEffect(() => {
     console.log("re-render LoadingAnimation");
   });
+
   return (
     <div className="group-animation">
       <svg
@@ -105,8 +113,37 @@ function LoadingAnimation({ active }) {
           fill="#5E6792"
         />
       </svg>
-      <p className="min-value">$368k</p>
-      <p className="max-value">$415k</p>
+      {active ? (
+        <>
+          <TextLoading
+            styles={`
+          font-weight: 600;
+          font-size: 24px;
+          color: #7f8cb2;
+          position: absolute;
+          margin: 0;
+          bottom: 0;
+          left: 20px;
+        `}
+          />
+          <TextLoading
+            styles={`
+          font-weight: 600;
+          font-size: 24px;
+          color: #7f8cb2;
+          position: absolute;
+          margin: 0;
+          bottom: 0;
+          right: 20px;
+        `}
+          />
+        </>
+      ) : (
+        <>
+          <p className="min-value">{formatter.format(min_value ?? 0)}</p>
+          <p className="max-value">{formatter.format(max_value ?? 0)}</p>
+        </>
+      )}
 
       <style jsx>{`
         * {
@@ -135,7 +172,6 @@ function LoadingAnimation({ active }) {
           position: absolute;
           bottom: 0;
           right: 50%;
-          transform: rotate(90deg); // remove after animation fix
         }
         .group-animation {
           position: relative;

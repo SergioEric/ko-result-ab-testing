@@ -8,6 +8,7 @@ import TimeOutView from "../components/timeout";
 import LoadingAnimation from "../components/loading_animation";
 import Footer from "../components/footer";
 import ContactForm from "../components/contact_form";
+import TextLoading from "../components/dots_animation";
 
 var formatter = Intl.NumberFormat("en-US", {
   style: "currency",
@@ -37,12 +38,6 @@ const fetcher = async (url) => {
   return res.json();
 };
 
-const checklist_reason = [
-  "Pellentesque faucibus adipiscing quis nibh non diam et bibendum.",
-  "Nibh molestie pellentesque nunc quis elementum nec maecenas potenti penatibus.",
-  // "check list reason 3",
-  // "check list reason 4",
-];
 const RemoteFetching = ({ remote }) => {
   const [timeoutExceeded, setTimeoutForRequest] = useState(false);
   const [data, setData] = useState();
@@ -93,13 +88,28 @@ const RemoteFetching = ({ remote }) => {
           <div className="offer-and-animation">
             <h2 className="preliminary-text">Your preliminary offer</h2>
             {!data ? (
-              <div className="offer">{"..."}</div>
+              <TextLoading
+                styles={`
+              display: flex;
+          justify-content: center;
+          padding: 0; // 10px 20px;
+
+          font-family: Montserrat;
+          font-size: 55px;
+          color: var(--orange);
+          font-weight: 700;`}
+              />
             ) : (
               <div>
                 <div className="offer">{formatter.format(data.price ?? 0)}</div>
               </div>
             )}
-            <LoadingAnimation active={animationStatus} />
+
+            <LoadingAnimation
+              active={animationStatus}
+              min_value={data?.lwr ?? 0}
+              max_value={data?.upr ?? 0}
+            />
           </div>
           <div className="address">
             {remote.address} {remote.city}, {remote.state} {remote.zipcode}
