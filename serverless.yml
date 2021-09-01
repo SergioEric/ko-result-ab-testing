@@ -1,0 +1,19 @@
+name: "Keller Offers"
+
+stage: ${opt:stage}
+
+nextApp:
+  component: "./node_modules/@sls-next/serverless-component"    # local ci build/deploy process
+  inputs:
+    name:
+      defaultLambda: ko-ab-test-${opt:stage}DefaultLambda
+      apiLambda: ko-ab-test-${opt:stage}ApiLambda
+    domain: ${file(./config/${stage}.json):domain}
+    memory: 512
+    env:
+      HC_API_KEY: ${env:HC_API_KEY}
+      HC_API_SECRET: ${env:HC_API_SECRET}
+      NEXT_PUBLIC_GOOGLE_MAPS_API: ${env:NEXT_PUBLIC_GOOGLE_MAPS_API}
+      NEXT_PUBLIC_GTM_ID: ${env:NEXT_PUBLIC_GTM_ID}
+      NEXT_PUBLIC_GA_TRACKING_ID: ${env:NEXT_PUBLIC_GA_TRACKING_ID}
+      NEXT_PUBLIC_UA_TRACKING_ID: ${env:NEXT_PUBLIC_UA_TRACKING_ID}
