@@ -18,6 +18,8 @@ var formatter = Intl.NumberFormat("en-US", {
 });
 
 const fetcher = async (url) => {
+  console.log('fetcher: ', url);
+
   const controller = new AbortController();
   //after 8 seconds we abort the request to the server
   const timeout = setTimeout(() => controller.abort(), 30000);
@@ -39,6 +41,8 @@ const fetcher = async (url) => {
 };
 
 const RemoteFetching = ({ remote }) => {
+  console.log('RemoteFetching: ', remote);
+
   const [timeoutExceeded, setTimeoutForRequest] = useState(false);
   const [data, setData] = useState();
   const [error, setError] = useState(false);
@@ -228,6 +232,7 @@ const RemoteFetching = ({ remote }) => {
   );
 };
 export default function Home({ remote }) {
+  console.log('Home: ', this);
   // const { data, error } = useSWR(
   //   `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`,
   //   fetcher

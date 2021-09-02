@@ -7,6 +7,8 @@ const API_KEY = process.env.HC_API_KEY;
 const API_SECRET = process.env.HC_API_SECRET;
 
 export default async function handler(req, res) {
+  console.log('property: ', req);
+  
   const { address, zipcode } = req.query;
   if (address == undefined && zipcode == undefined)
     return res.status(400).send("Address and Zipcode is missing");
