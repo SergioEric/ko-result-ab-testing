@@ -8,7 +8,7 @@ nextApp:
     name:
       defaultLambda: ko-ab-test-${opt:stage}DefaultLambda
       apiLambda: ko-ab-test-${opt:stage}ApiLambda
-    domain: ${file(./config/${stage}.json):domain}
+    domain: readygetoffer.com
     memory: 512
     env:
       HC_API_KEY: ${env:HC_API_KEY}

@@ -53,7 +53,6 @@ deploy-production:
   before_script:
     - apk add jq
   script:
-    - echo 'Checking Env Var:' && env
     - aws s3 sync s3://ko-ab-test-serverless/.serverless-production/ .serverless/
     - export CLOUDFRONT_DISTRIBUTION_ID=$(cat .serverless/Template.nextApp.AwsS3.json | jq -r .name)
     - if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then aws s3 rm s3://$CLOUDFRONT_DISTRIBUTION_ID --recursive; fi
