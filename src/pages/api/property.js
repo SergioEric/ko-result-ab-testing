@@ -6,7 +6,7 @@ const url = "https://api.housecanary.com/v2/property/value";
 const API_KEY = process.env.HC_API_KEY;
 const API_SECRET = process.env.HC_API_SECRET;
 
-export default async function handler(req, res) {
+export default async (req, res) => {
   console.log('property: ', req);
 
   const { address, zipcode } = req.query;

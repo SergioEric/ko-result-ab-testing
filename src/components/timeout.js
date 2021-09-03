@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import LogoHeader from "../components/logo_header";
-import svg from "../public/illustration.svg";
+import svg from "../../public/illustration.svg";
 const TimeOutView = ({ remote }) => {
   return (
     <section className="main-section">

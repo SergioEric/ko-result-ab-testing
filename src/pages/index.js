@@ -54,23 +54,26 @@ const RemoteFetching = ({ remote }) => {
   const [animationStatus, setAnimationStatus] = useState(true);
   const [activeForm, setActiveForm] = useState(false);
 
-  useEffect(async () => {
-    try {
-      const json = await fetcher(
-        `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
-      );
-      // console.log(json);
-      setData(json);
-      if (!json.data) setError(true);
-      setAnimationStatus(false);
-    } catch (e) {
-      // debugger;
-      console.log(e);
-      if (e.name === "AbortError") {
-        setTimeoutForRequest(true);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const json = await fetcher(
+          `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
+        );
+        // console.log(json);
+        setData(json);
+        if (!json.data) setError(true);
+        setAnimationStatus(false);
+      } catch (e) {
+        // debugger;
+        console.log(e);
+        if (e.name === "AbortError") {
+          setTimeoutForRequest(true);
+        }
+        setAnimationStatus(false);
       }
-      setAnimationStatus(false);
     }
+    fetchData();
   }, []);
 
   if (error && !timeoutExceeded) {
