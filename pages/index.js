@@ -23,21 +23,26 @@ const fetcher = async (url) => {
   const controller = new AbortController();
   //after 8 seconds we abort the request to the server
   const timeout = setTimeout(() => controller.abort(), 30000);
-  //{ signal: controller.signal }
-  const res = await fetch(url, { signal: controller.signal });
 
-  // If the status code is not in the range 200-299,
-  // we still try to parse and throw it.
-  if (!res.ok) {
-    const error = new Error();
-    // Attach extra info to the error object.
-    error.info = await res.json();
-    error.status = res.status;
-    throw error;
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    // If the status code is not in the range 200-299,
+    // we still try to parse and throw it.
+    if (!res.ok) {
+      const error = new Error();
+      // Attach extra info to the error object.
+      error.info = await res.json();
+      error.status = res.status;
+      throw error;
+    }
+    clearTimeout(timeout);
+
+    return res.json();
+  } catch (err) {
+    console.log('fetcher: ', err);
+    return null;
   }
-  clearTimeout(timeout);
-
-  return res.json();
 };
 
 const RemoteFetching = ({ remote }) => {
@@ -60,7 +65,7 @@ const RemoteFetching = ({ remote }) => {
       setAnimationStatus(false);
     } catch (e) {
       // debugger;
-      // console.log(e);
+      console.log(e);
       if (e.name === "AbortError") {
         setTimeoutForRequest(true);
       }
@@ -259,7 +264,7 @@ export default function Home({ remote }) {
 }
 
 export async function getServerSideProps(context) {
-  console.log(context.query);
+  console.log('getServerSideProps: ', context.query);
 
   const { address, zipcode, city, state } = context.query;
 
