@@ -89,17 +89,18 @@ const ContactForm = ({}) => {
     event.preventDefault();
     const data = new FormData(event.target);
     const json = JSON.stringify(Object.fromEntries(data));
-    // changePopup("visible");
-    // console.log(json);
-
     setIsSendingData(true);
-    const json_response = await fetcher("/api/upload_form", json);
-    // console.log(json_response);
-    setIsSendingData(false);
-    if (json_response.data) {
-      if (errorSavingForm) setErrorSavingForm(false);
-      changePopup("visible");
-    } else {
+    try {
+      const json_response = await fetcher("/api/upload_form", json);
+      setIsSendingData(false);
+      if (json_response.data) {
+        if (errorSavingForm) setErrorSavingForm(false);
+        changePopup("visible");
+      } else {
+        setErrorSavingForm(true);
+      }
+    } catch (e) {
+      setIsSendingData(false);
       setErrorSavingForm(true);
     }
   };

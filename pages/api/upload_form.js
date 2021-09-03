@@ -30,6 +30,7 @@ module.exports = async (req, res) => {
     agent_phone,
     agent_type,
     other_agent,
+    date: new Date().toGMTString(),
   };
   const client = await connectToDatabase;
   const db = client.db(dbName);
