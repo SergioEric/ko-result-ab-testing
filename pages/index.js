@@ -254,7 +254,7 @@ export default function Home({ remote }) {
 }
 
 export async function getServerSideProps(context) {
-  console.log(context.query);
+  // console.log(context.query);
 
   const { address, zipcode, city, state } = context.query;
 

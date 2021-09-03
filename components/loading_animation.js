@@ -15,7 +15,7 @@ function LoadingAnimation({ active, min_value, max_value }) {
   const anime = useRef(() => {});
   const stopAt = () => {
     anime.current.pause();
-    console.log(`stopAt: ${animation_progress.current}`);
+    // console.log(`stopAt: ${animation_progress.current}`);
   };
   const seek = () => {
     stopAt();
@@ -28,14 +28,14 @@ function LoadingAnimation({ active, min_value, max_value }) {
         // ? we have to go in reverse
         animation.seek(animation.duration * (flag / 100));
         flag = flag - 2;
-        console.log(flag);
+        // console.log(flag);
         if (flag <= value) {
           clearInterval(timer);
         }
       } else {
         animation.seek(animation.duration * (flag / 100));
         flag = flag + 2;
-        console.log(flag);
+        // console.log(flag);
         if (flag >= value) {
           clearInterval(timer);
         }
@@ -43,7 +43,7 @@ function LoadingAnimation({ active, min_value, max_value }) {
     }, 2);
   };
   useEffect(() => {
-    console.log(`active:${active}`);
+    // console.log(`active:${active}`);
     if (!active) {
       seek();
       return () => {};
@@ -63,9 +63,6 @@ function LoadingAnimation({ active, min_value, max_value }) {
     });
     // if (!active) seek();
   }, [active]);
-  useEffect(() => {
-    console.log("re-render LoadingAnimation");
-  });
 
   return (
     <div className="group-animation">

@@ -43,11 +43,6 @@ const NotFound = ({ remote }) => {
       </div>
       <div style={{ flexGrow: 1 }}></div>
       <style jsx>{`
-         {
-          /* * {
-          border: 1px solid rgba(0, 0, 0, 0);
-        } */
-        }
         h2,
         img {
           display: inline-block;

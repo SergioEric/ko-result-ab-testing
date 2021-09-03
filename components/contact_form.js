@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 const contact_type_list = [
   "Phone, e-mail and/or SMS",
@@ -17,6 +17,33 @@ const agents_list = [
   "RedFin",
   "Other",
 ];
+const fetcher = async (url, body) => {
+  const controller = new AbortController();
+  //after 8 seconds we abort the request to the server
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  //{ signal: controller.signal }
+  const res = await fetch(url, {
+    signal: controller.signal,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: body,
+  });
+
+  // If the status code is not in the range 200-299,
+  // we still try to parse and throw it.
+  if (!res.ok) {
+    const error = new Error();
+    // Attach extra info to the error object.
+    error.info = await res.json();
+    error.status = res.status;
+    throw error;
+  }
+  clearTimeout(timeout);
+
+  return res.json();
+};
 
 const ContactForm = ({}) => {
   const [agentState, switchAgentState] = useState(false);
@@ -25,50 +52,56 @@ const ContactForm = ({}) => {
 
   const [isSendingData, setIsSendingData] = useState(false);
 
-  const handleSubmition = (event) => {
+  const [errorSavingForm, setErrorSavingForm] = useState(false);
+
+  const handleSubmition = async (event) => {
     /* JSON without agent part
     {
-      "contact-name": "Jhon Doe",
+      "contact_name": "Jhon Doe",
       phone: "1343455 343",
       email: "contact@domain.com",
-      "contact-type": "Phone, e-mail and/or SMS",
+      "contact_type": "Phone, e-mail and/or SMS",
     }
     */
     /* JSON with an agent of the *agents_list*
     {
-      "contact-name": "Jhon Doe",
+      "contact_name": "Jhon Doe",
       phone: "1343455 343",
       email: "contact@domain.com",
-      "contact-type": "E-mail",
-      "agent-name": "Andrew McAgent",
-      "agent-phone": "423342",
-      "agent-type": "Keller Williams",
+      "contact_type": "E-mail",
+      "agent_name": "Andrew McAgent",
+      "agent_phone": "423342",
+      "agent_type": "Keller Williams",
     };
     */
     /* JSON with a CUSTOM agent
     {
-      "contact-name": "Jhon Doe",
+      "contact_name": "Jhon Doe",
       phone: "1343455 343",
       email: "contact@domain.com",
-      "contact-type": "E-mail",
-      "agent-name": "Andrew McAgent",
-      "agent-phone": "423342",
-      "agent-type": "Other",
-      "other-agent":"Custom Agent",
+      "contact_type": "E-mail",
+      "agent_name": "Andrew McAgent",
+      "agent_phone": "423342",
+      "agent_type": "Other",
+      "other_agent":"Custom Agent",
     };
     */
     event.preventDefault();
     const data = new FormData(event.target);
     const json = JSON.stringify(Object.fromEntries(data));
     // changePopup("visible");
-    console.log(json);
+    // console.log(json);
 
-    // TODO make fetching call to the API
     setIsSendingData(true);
-    setTimeout(() => {
+    const json_response = await fetcher("/api/upload_form", json);
+    // console.log(json_response);
+    setIsSendingData(false);
+    if (json_response.data) {
+      if (errorSavingForm) setErrorSavingForm(false);
       changePopup("visible");
-      setIsSendingData(false);
-    }, 2000);
+    } else {
+      setErrorSavingForm(true);
+    }
   };
 
   return (
@@ -92,6 +125,7 @@ const ContactForm = ({}) => {
             className="button close-popup"
             onClick={() => {
               changePopup("hidden");
+              window.location.href = "https://kelleroffers.com/";
             }}
           >
             Close
@@ -105,7 +139,7 @@ const ContactForm = ({}) => {
             <input
               type="text"
               placeholder="Write your name here..."
-              name="contact-name"
+              name="contact_name"
               autoComplete="off"
               required
             />
@@ -131,10 +165,10 @@ const ContactForm = ({}) => {
           <div className="contact-type">
             <p>I prefer to be contacted by</p>
             <select
-              name="contact-type"
-              onChange={(e) => {
-                console.log(e.target.value);
-              }}
+              name="contact_type"
+              // onChange={(e) => {
+              //   console.log(e.target.value);
+              // }}
               className="select"
             >
               {contact_type_list.map((value, index) => (
@@ -165,7 +199,7 @@ const ContactForm = ({}) => {
                 <input
                   type="text"
                   placeholder="Write name here..."
-                  name="agent-name"
+                  name="agent_name"
                   autoComplete="off"
                   required
                 />
@@ -175,15 +209,15 @@ const ContactForm = ({}) => {
                 <input
                   type="number"
                   placeholder="Write phone here..."
-                  name="agent-phone"
+                  name="agent_phone"
                   required
                 />
               </div>
               <select
-                name="agent-type"
+                name="agent_type"
                 onChange={(e) => {
                   const option = e.target.value;
-                  console.log(option);
+                  // console.log(option);
                   if (option === agents_list[agents_list.length - 1]) {
                     // activate other form for agent
                     if (isOtherAgent) return;
@@ -208,7 +242,7 @@ const ContactForm = ({}) => {
                     <input
                       type="text"
                       placeholder="Write here..."
-                      name="other-agent"
+                      name="other_agent"
                       required
                     />
                   </div>
@@ -222,15 +256,24 @@ const ContactForm = ({}) => {
         {isSendingData ? (
           <LoadingEllipsis />
         ) : (
-          <input className="button submit" type="submit" />
+          <>
+            {!errorSavingForm ? (
+              <input className="button" type="submit" />
+            ) : (
+              <></>
+            )}
+          </>
+        )}
+        {errorSavingForm ? (
+          <ErrorSavingFormData handleClick={() => {}} />
+        ) : (
+          <></>
         )}
       </form>
 
       <style jsx>{`
-         {
-          /* * {
-          border: 1px solid rgba(255, 5, 243, 0);
-        } */
+        * {
+          //border: 1px solid rgba(255, 5, 243, 0.2);
         }
         label {
           font-family: Montserrat;
@@ -480,6 +523,60 @@ const LoadingEllipsis = () => {
         }
       `}</style>
     </div>
+  );
+};
+
+const ErrorSavingFormData = ({ handleClick }) => {
+  return (
+    <>
+      <div className="Container">
+        <svg
+          width="32"
+          height="33"
+          viewBox="0 0 32 33"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M26.7004 24.6996L16.9004 7.29961C16.5004 6.69961 15.5004 6.69961 15.2004 7.29961L5.30039 24.6996C5.10039 24.9996 5.10039 25.3996 5.30039 25.6996C5.50039 25.9996 5.80039 26.1996 6.20039 26.1996H25.8004C26.2004 26.1996 26.5004 25.9996 26.7004 25.6996C26.9004 25.3996 26.9004 24.9996 26.7004 24.6996ZM15.0004 13.8996C15.0004 13.2996 15.4004 12.8996 16.0004 12.8996C16.6004 12.8996 17.0004 13.2996 17.0004 13.8996V18.6996C17.0004 19.2996 16.6004 19.6996 16.0004 19.6996C15.4004 19.6996 15.0004 19.2996 15.0004 18.6996V13.8996ZM16.0004 22.9996C15.4004 22.9996 14.9004 22.4996 14.9004 21.8996C14.9004 21.2996 15.4004 20.7996 16.0004 20.7996C16.6004 20.7996 17.1004 21.2996 17.1004 21.8996C17.1004 22.4996 16.6004 22.9996 16.0004 22.9996Z"
+            fill="#DF546A"
+          />
+        </svg>
+        <p>We couldn't save the form data</p>
+        <span style={{ flexGrow: 1 }}></span>
+        <button className="button" onClick={handleClick}>
+          Try again
+        </button>
+      </div>
+
+      <style jsx>
+        {`
+          .Container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 20px 25px;
+            max-width: 664px;
+            background: rgba(223, 84, 106, 0.1);
+            border-radius: 5px;
+            grid-gap: 14px;
+
+            align-self: center;
+          }
+
+          .Container p {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.5px;
+            color: #df546a;
+            margin: 0;
+          }
+        `}
+      </style>
+    </>
   );
 };
 

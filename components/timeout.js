@@ -22,8 +22,6 @@ const TimeOutView = ({ remote }) => {
         </section>
       </div>
       <style jsx>{`
-        * {
-        }
         .main-section {
           max-width: 100%;
           display: flex;
