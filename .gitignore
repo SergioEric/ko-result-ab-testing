@@ -37,3 +37,5 @@ testing_responses.js
 
 .serverless/
 .serverless_nextjs/
+
+.env
