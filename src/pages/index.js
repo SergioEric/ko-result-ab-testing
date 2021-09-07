@@ -8,6 +8,7 @@ import TimeOutView from "../components/timeout";
 import LoadingAnimation from "../components/loading_animation";
 import Footer from "../components/footer";
 import ContactForm from "../components/contact_form";
+import TextLoading from "../components/dots_animation";
 
 var formatter = Intl.NumberFormat("en-US", {
   style: "currency",
@@ -17,56 +18,62 @@ var formatter = Intl.NumberFormat("en-US", {
 });
 
 const fetcher = async (url) => {
+  console.log('fetcher: ', url);
+
   const controller = new AbortController();
   //after 8 seconds we abort the request to the server
   const timeout = setTimeout(() => controller.abort(), 30000);
-  //{ signal: controller.signal }
-  const res = await fetch(url, { signal: controller.signal });
 
-  // If the status code is not in the range 200-299,
-  // we still try to parse and throw it.
-  if (!res.ok) {
-    const error = new Error();
-    // Attach extra info to the error object.
-    error.info = await res.json();
-    error.status = res.status;
-    throw error;
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    // If the status code is not in the range 200-299,
+    // we still try to parse and throw it.
+    if (!res.ok) {
+      const error = new Error();
+      // Attach extra info to the error object.
+      error.info = await res.json();
+      error.status = res.status;
+      throw error;
+    }
+    clearTimeout(timeout);
+
+    return res.json();
+  } catch (err) {
+    console.log('fetcher: ', err);
+    return null;
   }
-  clearTimeout(timeout);
-
-  return res.json();
 };
 
-const checklist_reason = [
-  "Pellentesque faucibus adipiscing quis nibh non diam et bibendum.",
-  "Nibh molestie pellentesque nunc quis elementum nec maecenas potenti penatibus.",
-  // "check list reason 3",
-  // "check list reason 4",
-];
 const RemoteFetching = ({ remote }) => {
+  console.log('RemoteFetching: ', remote);
+
   const [timeoutExceeded, setTimeoutForRequest] = useState(false);
   const [data, setData] = useState();
   const [error, setError] = useState(false);
   const [animationStatus, setAnimationStatus] = useState(true);
   const [activeForm, setActiveForm] = useState(false);
 
-  useEffect(async () => {
-    try {
-      const json = await fetcher(
-        `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
-      );
-      // console.log(json);
-      setData(json);
-      if (!json.data) setError(true);
-      setAnimationStatus(false);
-    } catch (e) {
-      // debugger;
-      // console.log(e);
-      if (e.name === "AbortError") {
-        setTimeoutForRequest(true);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const json = await fetcher(
+          `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
+        );
+        // console.log(json);
+        setData(json);
+        if (!json.data) setError(true);
+        setAnimationStatus(false);
+      } catch (e) {
+        // debugger;
+        console.log(e);
+        if (e.name === "AbortError") {
+          setTimeoutForRequest(true);
+        }
+        setAnimationStatus(false);
       }
-      setAnimationStatus(false);
     }
+    fetchData();
   }, []);
 
   if (error && !timeoutExceeded) {
@@ -93,13 +100,28 @@ const RemoteFetching = ({ remote }) => {
           <div className="offer-and-animation">
             <h2 className="preliminary-text">Your preliminary offer</h2>
             {!data ? (
-              <div className="offer">{"..."}</div>
+              <TextLoading
+                styles={`
+              display: flex;
+          justify-content: center;
+          padding: 0; // 10px 20px;
+
+          font-family: Montserrat;
+          font-size: 55px;
+          color: var(--orange);
+          font-weight: 700;`}
+              />
             ) : (
               <div>
                 <div className="offer">{formatter.format(data.price ?? 0)}</div>
               </div>
             )}
-            <LoadingAnimation active={animationStatus} />
+
+            <LoadingAnimation
+              active={animationStatus}
+              min_value={data?.lwr ?? 0}
+              max_value={data?.upr ?? 0}
+            />
           </div>
           <div className="address">
             {remote.address} {remote.city}, {remote.state} {remote.zipcode}
@@ -119,22 +141,26 @@ const RemoteFetching = ({ remote }) => {
       <div style={{ flexGrow: 1 }}></div>
       <Footer />
       <style jsx>{`
-        * {
-          border: 1px solid rgba(5, 226, 255, 0.2);
+         {
+          /* * {
+          border: 1px solid rgba(5, 226, 255, 0);
+        } */
         }
         .main-section {
-          max-width: 100%;
+          width: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           height: 100vh;
         }
         .offer-container {
-          max-width: 80%;
+          max-width: 1440px;
+          width: 80%;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          padding: 20px 0px;
         }
         .offer {
           display: flex;
@@ -150,8 +176,8 @@ const RemoteFetching = ({ remote }) => {
         .offer-and-address {
           display: flex;
           margin-bottom: 20px;
-          border: 1px solid rgb(112, 112, 112);
           width: 100%;
+          flex-direction: row;
         }
         .offer-and-animation {
           display: flex;
@@ -163,7 +189,7 @@ const RemoteFetching = ({ remote }) => {
           font-weight: 700;
           font-size: 24px;
           color: var(--orange);
-          margin-top: 0; //10px;
+          margin: 0;
           text-align: center;
         }
 
@@ -175,6 +201,9 @@ const RemoteFetching = ({ remote }) => {
           color: var(--blue-gray);
           align-self: center;
           padding: 0px 40px;
+          width: 100%;
+          text-align: center;
+          margin-top: 10px;
         }
         .check {
           column-gap: 5px;
@@ -189,31 +218,29 @@ const RemoteFetching = ({ remote }) => {
           margin-right: 5px;
           border-radius: 20px;
         }
-        .address {
-          color: #5e6792;
-        }
         .primary {
           color: #234951;
         }
         .main-box {
           padding: 30px;
         }
-        .ko {
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-        }
         .margin-top {
           margin-top: 100px;
+        }
+        @media (max-width: 830px) {
+          .offer-and-address {
+            flex-direction: column;
+            justify-content: center;
+            display: flex;
+            align-self: center;
+          }
         }
       `}</style>
     </section>
   );
 };
 export default function Home({ remote }) {
+  console.log('Home: ', this);
   // const { data, error } = useSWR(
   //   `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`,
   //   fetcher
@@ -240,7 +267,7 @@ export default function Home({ remote }) {
 }
 
 export async function getServerSideProps(context) {
-  console.log(context.query);
+  console.log('getServerSideProps: ', context.query);
 
   const { address, zipcode, city, state } = context.query;
 

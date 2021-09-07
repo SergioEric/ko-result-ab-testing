@@ -1,0 +1,59 @@
+stages:
+  - build
+  - deploy-production
+
+build:
+  image: serverlesspolska/serverless-framework
+  stage: build
+  script:
+    - yarn && sls build --component=nextApp
+    - if [ ! -d ".serverless_nextjs" ]; then echo "Failed to build" && exit 1; fi
+  artifacts:
+    paths:
+      - .serverless_nextjs/
+      - .next/
+      - node_modules/
+  only:
+    refs:
+      # - develop
+      - master
+
+# deploy-develop:
+#   image: serverlesspolska/serverless-framework
+#   stage: deploy-develop
+#   before_script:
+#     - apk add jq
+#   script:
+#     - aws s3 sync s3://ko-website-react/.serverless-develop/ .serverless/
+#     - export CLOUDFRONT_DISTRIBUTION_ID=$(cat .serverless/Template.nextApp.AwsS3.json | jq -r .name)
+#     - if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then aws s3 rm s3://$CLOUDFRONT_DISTRIBUTION_ID --recursive; fi
+#     - sls deploy --stage develop --component=nextApp
+#   environment:
+#     name: develop
+#     url: https://dev.readygetoffer.com
+#   only:
+#     refs:
+#       - develop
+#     changes:
+#       - src/**/*
+#       - public/**/*
+#       - config/**/*
+#       - serverless.yml
+#       - .gitlab-ci.yml
+
+deploy-production:
+  image: serverlesspolska/serverless-framework
+  stage: deploy-production
+  before_script:
+    - apk add jq
+  script:
+    - aws s3 sync s3://ko-ab-test-serverless/.serverless-production/ .serverless/
+    - export CLOUDFRONT_DISTRIBUTION_ID=$(cat .serverless/Template.nextApp.AwsS3.json | jq -r .name)
+    - if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then aws s3 rm s3://$CLOUDFRONT_DISTRIBUTION_ID --recursive; fi
+    - sls deploy --stage production --component=nextApp
+  environment:
+    name: production
+    url: https://readygetoffer.com
+  only:
+    refs:
+      - master

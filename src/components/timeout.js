@@ -1,35 +1,27 @@
-import LogoHeader from "../components/logo_header";
+import { useEffect } from "react";
 import Image from "next/image";
-
-const BadUrlView = ({ message }) => {
+import LogoHeader from "../components/logo_header";
+import svg from "../../public/illustration.svg";
+const TimeOutView = ({ remote }) => {
   return (
     <section className="main-section">
       <LogoHeader />
       <div className="main-container">
-        <Image
-          src="/not_found.png"
-          className="logo-img"
-          height={195.32}
-          width={265}
-          alt="ko-logo"
-        />
+        <Image src={svg} width={321} height={321} />
         <section className="message-section">
-          <h2 className="preliminary-text">Sorry,</h2>
+          <h2 className="preliminary-text">It is not you!</h2>
           <div className="message-avscsc">
-            There seems to be something wrong with your Address
+            The server took an awful long time to respond.
           </div>
           <div
             className="action-btn"
             onClick={() => alert("TODO: redirect to instapage")}
           >
-            <p>Please review and try again</p>
+            <p>Please try again</p>
           </div>
         </section>
       </div>
       <style jsx>{`
-        * {
-          border: 1px solid transparent;
-        }
         .main-section {
           max-width: 100%;
           display: flex;
@@ -40,6 +32,7 @@ const BadUrlView = ({ message }) => {
         }
         .main-container {
           max-width: 70%;
+          max-width: 1440px;
           display: flex;
           column-gap: 157px;
           flex-direction: row;
@@ -96,11 +89,9 @@ const BadUrlView = ({ message }) => {
           color: #7da7b0;
           cursor: pointer;
         }
-        .action-btn:hover {
-        }
       `}</style>
     </section>
   );
 };
 
-export default BadUrlView;
+export default TimeOutView;

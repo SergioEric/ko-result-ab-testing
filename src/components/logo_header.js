@@ -17,7 +17,7 @@ const LogoHeader = () => (
         margin-left: 100px;
       }
       .logo-header {
-        height: 88px;
+        min-height: 60px;
         background-color: var(--background);
         width: 100%;
         display: flex;
