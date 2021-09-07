@@ -17,12 +17,6 @@ build:
     refs:
       # - develop
       - master
-    changes:
-      - src/**/*
-      - public/**/*
-      - config/**/*
-      - serverless.yml
-      - .gitlab-ci.yml
 
 # deploy-develop:
 #   image: serverlesspolska/serverless-framework
@@ -63,9 +57,3 @@ deploy-production:
   only:
     refs:
       - master
-    changes:
-      - src/**/*
-      - public/**/*
-      - config/**/*
-      - serverless.yml
-      - .gitlab-ci.yml

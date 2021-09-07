@@ -1,4 +1,4 @@
-import connectToDatabase from "../../src/db.connection";
+import connectToDatabase from "../../db.connection";
 
 const dbName = "ab-test";
 

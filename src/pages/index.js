@@ -18,50 +18,62 @@ var formatter = Intl.NumberFormat("en-US", {
 });
 
 const fetcher = async (url) => {
+  console.log('fetcher: ', url);
+
   const controller = new AbortController();
   //after 8 seconds we abort the request to the server
   const timeout = setTimeout(() => controller.abort(), 30000);
-  //{ signal: controller.signal }
-  const res = await fetch(url, { signal: controller.signal });
 
-  // If the status code is not in the range 200-299,
-  // we still try to parse and throw it.
-  if (!res.ok) {
-    const error = new Error();
-    // Attach extra info to the error object.
-    error.info = await res.json();
-    error.status = res.status;
-    throw error;
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    // If the status code is not in the range 200-299,
+    // we still try to parse and throw it.
+    if (!res.ok) {
+      const error = new Error();
+      // Attach extra info to the error object.
+      error.info = await res.json();
+      error.status = res.status;
+      throw error;
+    }
+    clearTimeout(timeout);
+
+    return res.json();
+  } catch (err) {
+    console.log('fetcher: ', err);
+    return null;
   }
-  clearTimeout(timeout);
-
-  return res.json();
 };
 
 const RemoteFetching = ({ remote }) => {
+  console.log('RemoteFetching: ', remote);
+
   const [timeoutExceeded, setTimeoutForRequest] = useState(false);
   const [data, setData] = useState();
   const [error, setError] = useState(false);
   const [animationStatus, setAnimationStatus] = useState(true);
   const [activeForm, setActiveForm] = useState(false);
 
-  useEffect(async () => {
-    try {
-      const json = await fetcher(
-        `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
-      );
-      // console.log(json);
-      setData(json);
-      if (!json.data) setError(true);
-      setAnimationStatus(false);
-    } catch (e) {
-      // debugger;
-      // console.log(e);
-      if (e.name === "AbortError") {
-        setTimeoutForRequest(true);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const json = await fetcher(
+          `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`
+        );
+        // console.log(json);
+        setData(json);
+        if (!json.data) setError(true);
+        setAnimationStatus(false);
+      } catch (e) {
+        // debugger;
+        console.log(e);
+        if (e.name === "AbortError") {
+          setTimeoutForRequest(true);
+        }
+        setAnimationStatus(false);
       }
-      setAnimationStatus(false);
     }
+    fetchData();
   }, []);
 
   if (error && !timeoutExceeded) {
@@ -228,6 +240,7 @@ const RemoteFetching = ({ remote }) => {
   );
 };
 export default function Home({ remote }) {
+  console.log('Home: ', this);
   // const { data, error } = useSWR(
   //   `/api/property?address=${remote.address}&zipcode=${remote.zipcode}`,
   //   fetcher
@@ -254,7 +267,7 @@ export default function Home({ remote }) {
 }
 
 export async function getServerSideProps(context) {
-  // console.log(context.query);
+  console.log('getServerSideProps: ', context.query);
 
   const { address, zipcode, city, state } = context.query;
 
